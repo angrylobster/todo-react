@@ -19,7 +19,7 @@ class App extends React.Component {
 
     validateAndAddWord(){
         if (this.state.word.length < 1 || this.state.word.length > 200){
-            this.addError("Invalid word length");
+            this.addError("Invalid word length. Items must be between 0 and 200 characters.");
         } else {
             this.clearErrors();
             this.addWord();
@@ -69,7 +69,7 @@ class Form extends React.Component {
     displayErrors(){
         if (this.props.errors.length !== 0) {
             return (
-                <div className="errors">
+                <div className="p-3 mb-2 bg-danger text-white">
                     { this.props.errors[this.props.errors.length - 1] }
                 </div>
             )
