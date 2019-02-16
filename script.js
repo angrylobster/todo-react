@@ -4,6 +4,7 @@ class App extends React.Component {
         this.trackInput = this.trackInput.bind(this);
         this.addWord = this.addWord.bind(this);
         this.validateAndAddWord = this.validateAndAddWord.bind(this);
+        this.removeWord = this.removeWord.bind(this);
         this.state = {
             list: [],
             errors: [],
@@ -26,10 +27,13 @@ class App extends React.Component {
         }
     }
 
-    // removeWord(){
-    //     let list = this.state.list.slice()
-    //     list.
-    // }
+    removeWord(index){
+        let list = this.state.list.slice();
+        list.splice(index,1);
+        this.setState({
+            list: list
+        })
+    }
 
     addWord(){
         let list = this.state.list.slice()
@@ -63,6 +67,7 @@ class App extends React.Component {
                 />
                 <List
                     list= { this.state.list }
+                    removeWord={ this.removeWord }
                 />
             </div>
         );
@@ -94,29 +99,15 @@ class Form extends React.Component {
 }
 
 class List extends React.Component {
-    applyHoverClass(e){
-        e.target.className = "bg-secondary text-white col-1 float-right align-center"
-    }
-
-    removeHoverClass(e){
-        e.target.className = "text-black-50 col-1 float-right"
-    }
-
-    mappedList(){
+    mapList(){
         return this.props.list.map((item, index) => {
             return (
-                <tr 
-                    className="d-flex"
-                    key={ (index + 1) + item }
-                >
-                    <td className="col-1">{ index + 1 }</td>
-                    <td className="col-10">{ item }</td>
-                    <td 
-                        className="text-black-50 col-1 float-right"
-                        onMouseLeave={ e => { this.removeHoverClass(e) }}
-                        onMouseOver={ e => { this.applyHoverClass(e) }}
-                    >x</td>
-                </tr>
+                <ListItem 
+                    item={ item } 
+                    index={ index }
+                    key={ index + item }
+                    removeWord={ this.props.removeWord }
+                />
             )
         })
     }
@@ -132,11 +123,38 @@ class List extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    { this.mappedList() }
+                    { this.mapList() }
                 </tbody>
             </table>
 
             </div>
+        )
+    }
+}
+
+class ListItem extends React.Component{
+    applyHoverClass(e){
+        e.target.className = "bg-secondary text-white col-1 float-right align-center"
+    }
+
+    removeHoverClass(e){
+        e.target.className = "text-black-50 col-1 float-right"
+    }
+
+    render(){
+        return(
+            <tr 
+                className="d-flex"
+            >
+                <td className="col-1">{ this.props.index + 1 }</td>
+                <td className="col-10">{ this.props.item }</td>
+                <td 
+                    className="text-black-50 col-1 float-right"
+                    onMouseLeave={ e => { this.removeHoverClass(e) }}
+                    onMouseOver={ e => { this.applyHoverClass(e) }}
+                    onClick={ () => { this.props.removeWord(this.props.index) }}
+                >x</td>
+            </tr>
         )
     }
 }
