@@ -26,6 +26,11 @@ class App extends React.Component {
         }
     }
 
+    // removeWord(){
+    //     let list = this.state.list.slice()
+    //     list.
+    // }
+
     addWord(){
         let list = this.state.list.slice()
         list.push(this.state.word)
@@ -65,7 +70,6 @@ class App extends React.Component {
 }
 
 class Form extends React.Component {
-
     displayErrors(){
         if (this.props.errors.length !== 0) {
             return (
@@ -90,12 +94,28 @@ class Form extends React.Component {
 }
 
 class List extends React.Component {
+    applyHoverClass(e){
+        e.target.className = "bg-secondary text-white col-1 float-right align-center"
+    }
+
+    removeHoverClass(e){
+        e.target.className = "text-black-50 col-1 float-right"
+    }
+
     mappedList(){
         return this.props.list.map((item, index) => {
             return (
-                <tr key={ (index + 1) + item }>
-                    <td>{ index + 1 }</td>
-                    <td>{ item }</td>
+                <tr 
+                    className="d-flex"
+                    key={ (index + 1) + item }
+                >
+                    <td className="col-1">{ index + 1 }</td>
+                    <td className="col-10">{ item }</td>
+                    <td 
+                        className="text-black-50 col-1 float-right"
+                        onMouseLeave={ e => { this.removeHoverClass(e) }}
+                        onMouseOver={ e => { this.applyHoverClass(e) }}
+                    >x</td>
                 </tr>
             )
         })
@@ -103,17 +123,20 @@ class List extends React.Component {
 
     render(){
         return(
-            <table striped='true'>
+            <div className="container-fluid">
+            <table className="table">
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Item</th>
+                    <tr className="d-flex">
+                        <th className="col-1">#</th>
+                        <th className="col-11" colSpan="2">Item</th>
                     </tr>
                 </thead>
                 <tbody>
                     { this.mappedList() }
                 </tbody>
             </table>
+
+            </div>
         )
     }
 }
