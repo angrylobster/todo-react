@@ -3,8 +3,10 @@ class App extends React.Component {
         super()
         this.trackInput = this.trackInput.bind(this);
         this.addWord = this.addWord.bind(this);
+        this.validateAndAddWord = this.validateAndAddWord.bind(this);
         this.state = {
             list: [],
+            errors: [],
             word: ""
         }
     }
@@ -15,6 +17,15 @@ class App extends React.Component {
         });
     }
 
+    validateAndAddWord(){
+        if (this.state.word.length < 1 || this.state.word.length > 200){
+            this.addError("Invalid word length");
+        } else {
+            this.clearErrors();
+            this.addWord();
+        }
+    }
+
     addWord(){
         let list = this.state.list.slice()
         list.push(this.state.word)
@@ -23,12 +34,27 @@ class App extends React.Component {
         })
     }
 
+    addError(errorMessage){
+        let errors = this.state.errors.slice();
+        errors.includes(errorMessage) ? null : errors.push(errorMessage);
+        this.setState({
+            errors: errors
+        })
+    }
+
+    clearErrors(){
+        this.setState({
+            errors: []
+        })
+    }
+
     render() {
         return ( 
             <div className = "list">
                 <Form 
                     trackInput={ this.trackInput }
-                    addWord={ this.addWord }
+                    validateAndAddWord={ this.validateAndAddWord }
+                    errors={ this.state.errors }
                 />
                 <List
                     list= { this.state.list }
@@ -39,13 +65,25 @@ class App extends React.Component {
 }
 
 class Form extends React.Component {
+
+    displayErrors(){
+        if (this.props.errors.length !== 0) {
+            return (
+                <div className="errors">
+                    { this.props.errors[this.props.errors.length - 1] }
+                </div>
+            )
+        }
+    }
+
     render() {
         return(
             <React.Fragment>
+                { this.displayErrors() }
                 <input 
-                    onChange = { this.props.trackInput }
+                    onChange={ this.props.trackInput }
                 /> 
-                <button onClick={ this.props.addWord }> add item </button>
+                <button onClick={ this.props.validateAndAddWord }> add item </button>
             </React.Fragment>
         )
     }
