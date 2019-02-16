@@ -2,6 +2,7 @@ class List extends React.Component {
     constructor() {
         super()
         this.changeHandler = this.changeHandler.bind(this);
+        this.registerWord = this.registerWord.bind(this);
         this.state = {
             list: [],
             word: ""
@@ -15,6 +16,15 @@ class List extends React.Component {
         console.log("change", event.target.value);
     }
 
+    addWord(){
+        let list = this.state.list.slice()
+        list.push(this.state.word)
+        this.setState({
+            list: list,
+            word: ""
+        })
+    }
+
     render() {
         return ( 
             <div className = "list">
@@ -22,7 +32,9 @@ class List extends React.Component {
                     onChange = { this.changeHandler }
                     value = { this.state.word }
                 /> 
-                <button> add item </button>
+                <button onClick={ this.addWord }> add item </button>
+                <br/>
+                { this.state.list }
             </div>
         );
     }
