@@ -1,19 +1,18 @@
 class List extends React.Component {
     constructor() {
         super()
-        this.changeHandler = this.changeHandler.bind(this);
-        this.registerWord = this.registerWord.bind(this);
+        this.trackInput = this.trackInput.bind(this);
+        this.addWord = this.addWord.bind(this);
         this.state = {
             list: [],
             word: ""
         }
     }
 
-    changeHandler(event) {
+    trackInput(event) {
         this.setState({
             word: event.target.value
         });
-        console.log("change", event.target.value);
     }
 
     addWord(){
@@ -21,22 +20,32 @@ class List extends React.Component {
         list.push(this.state.word)
         this.setState({
             list: list,
-            word: ""
         })
     }
 
     render() {
         return ( 
             <div className = "list">
-                <input 
-                    onChange = { this.changeHandler }
-                    value = { this.state.word }
-                /> 
-                <button onClick={ this.addWord }> add item </button>
-                <br/>
-                { this.state.list }
+                <Form 
+                    trackInput={ this.trackInput }
+                    addWord={ this.addWord }
+                />
+                {this.state.list}
             </div>
         );
+    }
+}
+
+class Form extends React.Component {
+    render() {
+        return(
+            <React.Fragment>
+                <input 
+                    onChange = { this.props.trackInput }
+                /> 
+                <button onClick={ this.props.addWord }> add item </button>
+            </React.Fragment>
+        )
     }
 }
 
