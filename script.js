@@ -1,4 +1,4 @@
-class List extends React.Component {
+class App extends React.Component {
     constructor() {
         super()
         this.trackInput = this.trackInput.bind(this);
@@ -30,7 +30,9 @@ class List extends React.Component {
                     trackInput={ this.trackInput }
                     addWord={ this.addWord }
                 />
-                {this.state.list}
+                <List
+                    list= { this.state.list }
+                />
             </div>
         );
     }
@@ -49,7 +51,36 @@ class Form extends React.Component {
     }
 }
 
+class List extends React.Component {
+    mappedList(){
+        return this.props.list.map((item, index) => {
+            return (
+                <tr key={ (index + 1) + item }>
+                    <td>{ index + 1 }</td>
+                    <td>{ item }</td>
+                </tr>
+            )
+        })
+    }
+
+    render(){
+        return(
+            <table striped='true'>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Item</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    { this.mappedList() }
+                </tbody>
+            </table>
+        )
+    }
+}
+
 ReactDOM.render( 
-    <List /> ,
+    <App /> ,
     document.getElementById('root')
 );
