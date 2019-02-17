@@ -54,8 +54,8 @@ class App extends React.Component {
     }
 
     editWord(index, editedWord){
-        let list = this.state.list.slice();
-        list[index] = editedWord
+        let list = [...this.state.list];
+        list.splice(index,1,editedWord);
         this.setState({
             list: list
         })
@@ -147,7 +147,7 @@ class List extends React.Component {
 class ListItem extends React.Component{
     constructor(){
         super()
-        this.editItem = this.editItem.bind(this)
+        this.startEdit = this.startEdit.bind(this)
         this.state = {
             isEditing: false
         }
@@ -161,9 +161,16 @@ class ListItem extends React.Component{
         e.target.className = "text-black-50 col-1 float-right"
     }
 
-    editItem(){
+    startEdit(){
         this.setState({
             isEditing: true
+        })
+    }
+
+    doEdit(e){
+        this.props.editWord(this.props.index, e.target.value);
+        this.setState({
+            isEditing: false
         })
     }
 
@@ -172,9 +179,12 @@ class ListItem extends React.Component{
             return (
                 <input 
                     defaultValue={this.props.item}
-                    onKeyDown={(e)=> {
+                    onBlur={ e => {
+                        this.doEdit(e);
+                    }}
+                    onKeyDown={ e => {
                         if(e.keyCode === 13){
-                            this.props.editWord(this.props.index, e.target.value)
+                            this.doEdit(e);
                         }
                     }}
                 />
@@ -190,11 +200,13 @@ class ListItem extends React.Component{
         return(
             <tr 
                 className="d-flex"
+                onDragStart={ e => { console.log(this) }}
+                draggable
             >
                 <td className="col-1">{ this.props.index + 1 }</td>
                 <td 
                     className="col-10"
-                    onClick={ e => { this.editItem(e) }}
+                    onClick={ e => { this.startEdit(e) }}
                 >
                     { this.showInputOrItem() }
                 </td>
