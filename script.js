@@ -5,6 +5,8 @@ class App extends React.Component {
         this.addWord = this.addWord.bind(this);
         this.validateAndAddWord = this.validateAndAddWord.bind(this);
         this.removeWord = this.removeWord.bind(this);
+        this.editWord = this.editWord.bind(this);
+
         this.state = {
             list: [],
             errors: [],
@@ -51,6 +53,14 @@ class App extends React.Component {
         })
     }
 
+    editWord(index, editedWord){
+        let list = this.state.list.slice();
+        list[index] = editedWord
+        this.setState({
+            list: list
+        })
+    }
+
     clearErrors(){
         this.setState({
             errors: []
@@ -68,6 +78,7 @@ class App extends React.Component {
                 <List
                     list= { this.state.list }
                     removeWord={ this.removeWord }
+                    editWord={ this.editWord }
                 />
             </div>
         );
@@ -107,6 +118,7 @@ class List extends React.Component {
                     index={ index }
                     key={ index + item }
                     removeWord={ this.props.removeWord }
+                    editWord={ this.props.editWord }
                 />
             )
         })
@@ -133,6 +145,14 @@ class List extends React.Component {
 }
 
 class ListItem extends React.Component{
+    constructor(){
+        super()
+        this.editItem = this.editItem.bind(this)
+        this.state = {
+            isEditing: false
+        }
+    }
+
     applyHoverClass(e){
         e.target.className = "bg-secondary text-white col-1 float-right align-center"
     }
@@ -141,19 +161,51 @@ class ListItem extends React.Component{
         e.target.className = "text-black-50 col-1 float-right"
     }
 
+    editItem(){
+        this.setState({
+            isEditing: true
+        })
+    }
+
+    showInputOrItem(){
+        if (this.state.isEditing){
+            return (
+                <input 
+                    defaultValue={this.props.item}
+                    onKeyDown={(e)=> {
+                        if(e.keyCode === 13){
+                            this.props.editWord(this.props.index, e.target.value)
+                        }
+                    }}
+                />
+            )
+        } else {
+            return (
+                this.props.item
+            )
+        }
+    }
+
     render(){
         return(
             <tr 
                 className="d-flex"
             >
                 <td className="col-1">{ this.props.index + 1 }</td>
-                <td className="col-10">{ this.props.item }</td>
+                <td 
+                    className="col-10"
+                    onClick={ e => { this.editItem(e) }}
+                >
+                    { this.showInputOrItem() }
+                </td>
                 <td 
                     className="text-black-50 col-1 float-right"
                     onMouseLeave={ e => { this.removeHoverClass(e) }}
                     onMouseOver={ e => { this.applyHoverClass(e) }}
                     onClick={ () => { this.props.removeWord(this.props.index) }}
-                >x</td>
+                >
+                    x
+                </td>
             </tr>
         )
     }
