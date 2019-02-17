@@ -6,9 +6,11 @@ class App extends React.Component {
         this.validateAndAddWord = this.validateAndAddWord.bind(this);
         this.removeWord = this.removeWord.bind(this);
         this.editWord = this.editWord.bind(this);
+        this.addDone = this.addDone.bind(this);
 
         this.state = {
             list: [],
+            doneList: [],
             errors: [],
             word: ""
         }
@@ -38,8 +40,8 @@ class App extends React.Component {
     }
 
     addWord(){
-        let list = this.state.list.slice()
-        list.push(this.state.word)
+        let list = this.state.list.slice();
+        list.push(this.state.word);
         this.setState({
             list: list,
         })
@@ -50,6 +52,14 @@ class App extends React.Component {
         errors.includes(errorMessage) ? null : errors.push(errorMessage);
         this.setState({
             errors: errors
+        })
+    }
+
+    addDone(done){
+        let doneList = this.state.doneList.slice();
+        doneList.push(done);
+        this.setState({
+            doneList: doneList
         })
     }
 
@@ -76,9 +86,11 @@ class App extends React.Component {
                     errors={ this.state.errors }
                 />
                 <List
-                    list= { this.state.list }
+                    list={ this.state.list }
+                    doneList={ this.state.doneList }
                     removeWord={ this.removeWord }
                     editWord={ this.editWord }
+                    addDone={ this.addDone }
                 />
             </div>
         );
@@ -102,6 +114,7 @@ class Form extends React.Component {
                 { this.displayErrors() }
                 <input 
                     onChange={ this.props.trackInput }
+                    onKeyDown={ e => { e.keyCode === 13 ? this.props.validateAndAddWord() : null }}
                 /> 
                 <button onClick={ this.props.validateAndAddWord }> add item </button>
             </React.Fragment>
@@ -110,8 +123,19 @@ class Form extends React.Component {
 }
 
 class List extends React.Component {
-    mapList(){
-        return this.props.list.map((item, index) => {
+
+    onDragOver(e){
+        e.preventDefault();
+    }
+
+    onDrop(e){
+        let listItem = JSON.parse(e.dataTransfer.getData('ListItem'));
+        this.props.removeWord(listItem.index);
+        this.props.addDone(listItem.item);
+    }
+
+    mapList(list){
+        return list.map((item, index) => {
             return (
                 <ListItem 
                     item={ item } 
@@ -127,18 +151,32 @@ class List extends React.Component {
     render(){
         return(
             <div className="container-fluid">
-            <table className="table">
-                <thead>
-                    <tr className="d-flex">
-                        <th className="col-1">#</th>
-                        <th className="col-11" colSpan="2">Item</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    { this.mapList() }
-                </tbody>
-            </table>
-
+                <table className="table mt-5">
+                    <thead>
+                        <tr className="d-flex">
+                            <th className="col-1">#</th>
+                            <th className="col-11" colSpan="2">Item</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { this.mapList(this.props.list) }
+                    </tbody>
+                </table>
+                <table 
+                    className="table mt-5"
+                    onDragOver={ e => { this.onDragOver(e) }}
+                    onDrop={ e => { this.onDrop(e, 'dropped') }}
+                >
+                    <thead>
+                        <tr className="d-flex">
+                            <th className="col-1">#</th>
+                            <th className="col-11" colSpan="2">Items Done</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { this.mapList(this.props.doneList) }
+                    </tbody>
+                </table>
             </div>
         )
     }
@@ -174,6 +212,10 @@ class ListItem extends React.Component{
         })
     }
 
+    onDragStart(e){
+        e.dataTransfer.setData('ListItem', JSON.stringify(this.props))
+    }
+
     showInputOrItem(){
         if (this.state.isEditing){
             return (
@@ -200,7 +242,7 @@ class ListItem extends React.Component{
         return(
             <tr 
                 className="d-flex"
-                onDragStart={ e => { console.log(this) }}
+                onDragStart={ e => { this.onDragStart(e) }}
                 draggable
             >
                 <td className="col-1">{ this.props.index + 1 }</td>
